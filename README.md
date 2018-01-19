@@ -1,4 +1,4 @@
-#rM sync
+# rM sync
 
 Sync script for the reMarkable paper tablet.
 
