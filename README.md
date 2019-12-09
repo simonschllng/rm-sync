@@ -8,15 +8,19 @@ _Ongoing work, contributions welcome._
 
 ## Usage
 
-This script is writen for and tested on linux. Feel free to adopt for mac or win.
+This script is written for and tested on linux. Feel free to adopt for mac or win.
 
  1. Save the script file to `~/bin`
  2. Change the path variable (and other) in the file as needed.
  3. Run with `./rM-sync.sh`
+ 
+### Options
+
+ * `-u` upload: Uploads new files to the reMarkable from local folder _uploads_.
+ * `-b` backup: Creates a backup of all user files on the reMarkable.
+ * `-d` download: Not yet implemented...
 
 ## Planned functionality
 
- * Keep backups of all user files in daily folders
  * Download PDFs of everything that changed on the tablet
- * Upload new files from a local folder to the device
 
