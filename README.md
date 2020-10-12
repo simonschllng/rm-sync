@@ -2,7 +2,7 @@
 
 Sync script for the reMarkable paper tablet.
 
-This script will give you sync and backup functionality uver USB. Great if you do not want to sync your rM to the cloud.
+This script will give you sync and backup functionality over USB. Great if you do not want to sync your rM to the cloud.
 
 _Ongoing work, contributions welcome._
 
