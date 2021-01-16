@@ -109,7 +109,7 @@ if [ $? == "0" ]; then
         do
             [ -e "$file" ] || continue
             echo -n $(basename "$file") ": "
-            curl --form "file=@\"$file\"" http://10.11.99.1/upload
+            curl --form "file=@\"$file\"" http://$RMIP/upload
             echo "."
             if [ 0 -eq $? ]; then rm "$file"; fi;
         done
