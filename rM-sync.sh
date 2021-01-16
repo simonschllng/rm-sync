@@ -16,7 +16,7 @@ MAINDIR="$HOME/rM"
 BACKUPDIR="$MAINDIR/backup/"             # rotating backups of all rM contents
 UPLOADDIR="$MAINDIR/upload/"             # all files here will be sent to rM
 OUTPUTDIR="$MAINDIR/files/"              # PDFs of everything on the rM
-LOG="sync.log"                          # Log file name in $MAINDIR
+LOG="sync.log"                           # Log file name in $MAINDIR
 BACKUPLIST="files.json"
 
 # Behaviour
@@ -50,8 +50,7 @@ if [ $? == "0" ]; then
   while getopts bdu opt
   do
      case $opt in
-       b) 
-
+       b)
           # Backup files
           echo "BEGIN BACKUP" | tee -a $LOG
           mkdir -p "$BACKUPDIR$TODAY"
@@ -75,7 +74,7 @@ if [ $? == "0" ]; then
           echo "BEGIN DOWNLOAD" | tee -a $LOG
           mkdir -p "$OUTPUTDIR"
           ls -1 "$BACKUPDIR$TODAY" | sed -e 's/\..*//g' | awk '!a[$0]++' > "$OUTPUTDIR/index"
-          
+
           echo "[" > "$OUTPUTDIR/index.json";
           for file in "$BACKUPDIR$TODAY"/*.metadata;
           do
