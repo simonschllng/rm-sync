@@ -61,9 +61,12 @@ if [ $? == "0" ]; then
             ERRORREASON=$ERRORREASON$'\n scp command failed'
             ERROR=1
           fi
-          echo "[" > "$BACKUPDIR$TODAY$BACKUPLIST"
-          find "$BACKUPDIR$TODAY" -name *.metadata -type f -exec sed -s '$a,' {} + | sed '$d' >> "$BACKUPDIR$TODAY$BACKUPLIST"
-          echo "]" >> "$BACKUPDIR$TODAY$BACKUPLIST"
+          # sed -s does not work on macOS (https://unix.stackexchange.com/a/131940)
+          if [ "$(uname)" == "Linux" ]; then
+            echo "[" > "$BACKUPDIR$TODAY$BACKUPLIST"
+            find "$BACKUPDIR$TODAY" -name *.metadata -type f -exec sed -s '$a,' {} + | sed '$d' >> "$BACKUPDIR$TODAY$BACKUPLIST"
+            echo "]" >> "$BACKUPDIR$TODAY$BACKUPLIST"
+          fi
           echo "BACKUP END" | tee -a $LOG
           ;;
 
