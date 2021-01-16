@@ -20,7 +20,13 @@ LOG="sync.log"                          # Log file name in $MAINDIR
 BACKUPLIST="files.json"
 
 # Behaviour
-NOTIFICATION="/usr/bin/notify-send"     # Notification script
+notification() {
+  if [ "$(uname)" == "Linux" ]; then
+    /usr/bin/notify-send $1 $2           # Notification script
+  elif [ "$(uname)" == "Darwin" ]; then
+    osascript -e "display notification \"$2\" with title \"$1\""
+  fi
+}
 
 LOG="$MAINDIR/$(date +%y%m%d)-$LOG"
 
@@ -117,10 +123,10 @@ else
   ERROR=1
 fi
 $DATE >> $LOG
-if [ -n "$NOTIFICATION" ]; then
-  if [ $ERROR ];then
-    $NOTIFICATION "ERROR in rM Sync!" "$ERRORREASON"
+if typeset -f notification > /dev/null; then
+  if [ $ERROR ]; then
+    notification "ERROR in rM Sync!" "$ERRORREASON"
   else
-    $NOTIFICATION "rM Sync Successfull"
+    notification "rM Sync Successfull"
   fi
 fi
