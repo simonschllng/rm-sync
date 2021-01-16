@@ -30,6 +30,9 @@ notification() {
 
 LOG="$MAINDIR/$(date +%y%m%d)-$LOG"
 
+# Create MAINDIR if it does not exist
+mkdir -p $MAINDIR
+
 echo $'\n' >> $LOG
 date >> $LOG
 
