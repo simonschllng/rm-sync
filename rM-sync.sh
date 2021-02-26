@@ -16,13 +16,22 @@ MAINDIR="$HOME/rM"
 BACKUPDIR="$MAINDIR/backup/"             # rotating backups of all rM contents
 UPLOADDIR="$MAINDIR/upload/"             # all files here will be sent to rM
 OUTPUTDIR="$MAINDIR/files/"              # PDFs of everything on the rM
-LOG="sync.log"                          # Log file name in $MAINDIR
+LOG="sync.log"                           # Log file name in $MAINDIR
 BACKUPLIST="files.json"
 
 # Behaviour
-NOTIFICATION="/usr/bin/notify-send"     # Notification script
+notification() {
+  if [ "$(uname)" == "Linux" ]; then
+    /usr/bin/notify-send $1 $2           # Notification script
+  elif [ "$(uname)" == "Darwin" ]; then
+    osascript -e "display notification \"$2\" with title \"$1\""
+  fi
+}
 
 LOG="$MAINDIR/$(date +%y%m%d)-$LOG"
+
+# Create MAINDIR if it does not exist
+mkdir -p $MAINDIR
 
 echo $'\n' >> $LOG
 date >> $LOG
@@ -41,8 +50,7 @@ if [ $? == "0" ]; then
   while getopts bdu opt
   do
      case $opt in
-       b) 
-
+       b)
           # Backup files
           echo "BEGIN BACKUP" | tee -a $LOG
           mkdir -p "$BACKUPDIR$TODAY"
@@ -52,9 +60,12 @@ if [ $? == "0" ]; then
             ERRORREASON=$ERRORREASON$'\n scp command failed'
             ERROR=1
           fi
-          echo "[" > "$BACKUPDIR$TODAY$BACKUPLIST"
-          find "$BACKUPDIR$TODAY" -name *.metadata -type f -exec sed -s '$a,' {} + | sed '$d' >> "$BACKUPDIR$TODAY$BACKUPLIST"
-          echo "]" >> "$BACKUPDIR$TODAY$BACKUPLIST"
+          # sed -s does not work on macOS (https://unix.stackexchange.com/a/131940)
+          if [ "$(uname)" == "Linux" ]; then
+            echo "[" > "$BACKUPDIR$TODAY$BACKUPLIST"
+            find "$BACKUPDIR$TODAY" -name *.metadata -type f -exec sed -s '$a,' {} + | sed '$d' >> "$BACKUPDIR$TODAY$BACKUPLIST"
+            echo "]" >> "$BACKUPDIR$TODAY$BACKUPLIST"
+          fi
           echo "BACKUP END" | tee -a $LOG
           ;;
 
@@ -63,7 +74,7 @@ if [ $? == "0" ]; then
           echo "BEGIN DOWNLOAD" | tee -a $LOG
           mkdir -p "$OUTPUTDIR"
           ls -1 "$BACKUPDIR$TODAY" | sed -e 's/\..*//g' | awk '!a[$0]++' > "$OUTPUTDIR/index"
-          
+
           echo "[" > "$OUTPUTDIR/index.json";
           for file in "$BACKUPDIR$TODAY"/*.metadata;
           do
@@ -98,7 +109,7 @@ if [ $? == "0" ]; then
         do
             [ -e "$file" ] || continue
             echo -n $(basename "$file") ": "
-            curl --form "file=@\"$file\"" http://10.11.99.1/upload
+            curl --form "file=@\"$file\"" http://$RMIP/upload
             echo "."
             if [ 0 -eq $? ]; then rm "$file"; fi;
         done
@@ -117,10 +128,10 @@ else
   ERROR=1
 fi
 $DATE >> $LOG
-if [ -n "$NOTIFICATION" ]; then
-  if [ $ERROR ];then
-    $NOTIFICATION "ERROR in rM Sync!" "$ERRORREASON"
+if typeset -f notification > /dev/null; then
+  if [ $ERROR ]; then
+    notification "ERROR in rM Sync!" "$ERRORREASON"
   else
-    $NOTIFICATION "rM Sync Successfull"
+    notification "rM Sync Successfull"
   fi
 fi
